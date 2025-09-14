@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RAG → Propositions (Lightning Talk)</title>
+  <style>
+    :root{
+      --bg:#0f1724;--card:#10182f;--accent:#ff9f1c;--muted:#9aa4b2;--text:#f8fafc;
+      --slide-padding:64px;
+    }
+    html,body{height:100%;margin:0;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+    body{background:radial-gradient(circle at top left,#182c47,#0f1724 70%);color:var(--text);display:flex;align-items:center;justify-content:center}
+    .deck{width:100%;max-width:1100px;height:680px;position:relative;overflow:hidden;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.6)}
+    .slide{position:absolute;inset:0;padding:var(--slide-padding);box-sizing:border-box;display:flex;flex-direction:column;gap:24px;transition:transform .6s cubic-bezier(.25,.8,.25,1),opacity .6s ease;backdrop-filter:blur(6px)}
+    .hidden{opacity:0;transform:translateX(60px) scale(.95);pointer-events:none}
+    h1{margin:0;font-size:52px;letter-spacing:-0.02em;line-height:1.2}
+    h2{margin:0;font-size:26px;color:var(--accent)}
+    p{margin:0;color:var(--text);font-size:22px;line-height:1.5}
+    ul{margin:8px 0 0 28px;padding:0;color:var(--muted);font-size:22px;line-height:1.5}
+    .controls{position:absolute;left:20px;bottom:20px;display:flex;gap:10px}
+    button{background:var(--accent);border:none;color:#000;font-weight:600;padding:12px 18px;border-radius:10px;cursor:pointer;font-size:18px;box-shadow:0 4px 12px rgba(0,0,0,0.3);transition:transform .2s ease}
+    button:hover{transform:scale(1.05)}
+    .pager{position:absolute;right:20px;bottom:26px;color:var(--muted);font-size:18px;font-weight:500}
+    .footer{margin-top:auto;color:var(--muted);font-size:16px}
+    pre{background:rgba(255,255,255,0.05);padding:16px;border-radius:12px;overflow:auto;color:#fff;font-size:20px}
+    .code-inline{font-family:monospace;background:rgba(255,255,255,0.08);padding:4px 8px;border-radius:6px;font-size:20px}
+    .chip{display:inline-block;padding:8px 14px;border-radius:999px;background:var(--accent);font-size:16px;color:#000;font-weight:600}
+  </style>
+</head>
+<body>
+  <div class="deck" id="deck">
+    <section class="slide" data-index="0">
+      <h1>🚀 RAG is Not Enough</h1>
+      <h2>From sentences → propositions for stronger retrieval</h2>
+      <p>Lightning talk • 5 minutes</p>
+      <div class="footer">
+        <span class="chip">Speaker: Jai Prakash</span>
+      </div>
+    </section>
+
+    <section class="slide hidden" data-index="1">
+      <h1>😵 The Problem</h1>
+      <p>Facts are scattered. Sentences are fragmented. Retrieval misses context.</p>
+      <ul>
+        <li>Sentence transformers → tiny pieces.</li>
+        <li>Vector DB → returns some sentences, not always the right ones.</li>
+        <li>Answers end up incomplete or wrong.</li>
+      </ul>
+    </section>
+
+    <section class="slide hidden" data-index="2">
+      <h1>🔍 Quick Example</h1>
+      <p>Query: <span class="code-inline">"What are the eligibility criteria?"</span></p>
+      <p>Retrieved sentences:</p>
+      <ul>
+        <li>"Applicant must be 18+."</li>
+        <li>"Proof of income required."</li>
+        <li>"Exceptions exist for students."</li>
+      </ul>
+      <p>❌ Missing combined rule = incomplete answer.</p>
+    </section>
+
+    <section class="slide hidden" data-index="3">
+      <h1>💡 The Proposition Approach</h1>
+      <p>Use LLMs to <strong>group related sentences</strong> into <strong>propositions</strong> — compact, fact-rich units.</p>
+      <ul>
+        <li>Cluster related text.</li>
+        <li>Rewrite into atomic propositions.</li>
+        <li>Embed propositions, not raw sentences.</li>
+      </ul>
+    </section>
+
+    <section class="slide hidden" data-index="4">
+      <h1>✨ Example Proposition</h1>
+      <pre>Applicants 18+ with proof of income qualify.
+Students are exempt if enrolled full-time.</pre>
+      <p>✅ One dense chunk instead of three scattered ones.</p>
+    </section>
+
+    <section class="slide hidden" data-index="5">
+      <h1>🚀 Why It Works</h1>
+      <ul>
+        <li>More information per vector = smarter retrieval.</li>
+        <li>Fewer fragments to stitch back.</li>
+        <li>Higher precision, no cost bloat.</li>
+      </ul>
+    </section>
+
+    <section class="slide hidden" data-index="6">
+      <h1>🛠️ How To Build</h1>
+      <ul>
+        <li>Split sentences → cluster by similarity.</li>
+        <li>Prompt LLM → generate propositions.</li>
+        <li>Embed & store in vector DB.</li>
+        <li>Retrieve top-k propositions for answering.</li>
+      </ul>
+      <pre>// Prompt idea:
+"Merge these sentences into a single fact-rich proposition."</pre>
+    </section>
+
+    <section class="slide hidden" data-index="7">
+      <h1>📊 Metrics</h1>
+      <ul>
+        <li>Completeness of answers (human eval)</li>
+        <li>Precision@k retrieval</li>
+        <li>Propositions vs sentences count</li>
+        <li>Latency & cost tradeoffs</li>
+      </ul>
+    </section>
+
+    <section class="slide hidden" data-index="8">
+      <h1>🎬 Demo Slide</h1>
+      <p>Before vs After Retrieval</p>
+      <ul>
+        <li>❌ Sentences → missing facts</li>
+        <li>✅ Propositions → complete context</li>
+      </ul>
+    </section>
+
+    <section class="slide hidden" data-index="9">
+      <h1>🎯 Key Takeaway</h1>
+      <p><strong>Don’t store plain sentences — store propositions.</strong></p>
+      <p class="footer">Questions? • Twitter: @jaiprakash • GitHub: jp-repo</p>
+    </section>
+
+    <div class="controls">
+      <button id="prev">◀ Prev</button>
+      <button id="next">Next ▶</button>
+      <button id="start">Presenter Mode</button>
+    </div>
+    <div class="pager" id="pager">1 / 10</div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    let idx = 0;
+    const pager = document.getElementById('pager');
+
+    function show(i){
+      slides.forEach(s => s.classList.add('hidden'));
+      const s = slides[i];
+      s.classList.remove('hidden');
+      pager.textContent = (i+1) + ' / ' + slides.length;
+    }
+
+    document.getElementById('next').addEventListener('click', ()=>{ idx = Math.min(idx+1, slides.length-1); show(idx); });
+    document.getElementById('prev').addEventListener('click', ()=>{ idx = Math.max(idx-1,0); show(idx); });
+
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'ArrowRight' || e.key === 'PageDown') idx = Math.min(idx+1, slides.length-1);
+      if(e.key === 'ArrowLeft' || e.key === 'PageUp') idx = Math.max(idx-1,0);
+      if(e.key === 'Home') idx = 0;
+      if(e.key === 'End') idx = slides.length-1;
+      show(idx);
+    });
+
+    document.getElementById('start').addEventListener('click', async ()=>{
+      try{ await document.querySelector('.deck').requestFullscreen(); }catch{}
+      idx = 0; show(idx);
+    });
+
+    show(0);
+  </script>
+</body>
+</html>
