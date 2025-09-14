@@ -5,123 +5,143 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RAG → Propositions (Lightning Talk)</title>
   <style>
-    :root{
-      --bg:#0f1724;--card:#10182f;--accent:#ff9f1c;--muted:#9aa4b2;--text:#f8fafc;
+    :root {
+      --bg:#0f1724; --card:#10182f; --accent:#ff9f1c; --muted:#9aa4b2; --text:#f8fafc;
       --slide-padding:64px;
     }
-    html,body{height:100%;margin:0;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
-    body{background:radial-gradient(circle at top left,#182c47,#0f1724 70%);color:var(--text);display:flex;align-items:center;justify-content:center}
-    .deck{width:100%;max-width:1100px;height:680px;position:relative;overflow:hidden;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.6)}
-    .slide{position:absolute;inset:0;padding:var(--slide-padding);box-sizing:border-box;display:flex;flex-direction:column;gap:24px;transition:transform .6s cubic-bezier(.25,.8,.25,1),opacity .6s ease;backdrop-filter:blur(6px)}
-    .hidden{opacity:0;transform:translateX(60px) scale(.95);pointer-events:none}
-    h1{margin:0;font-size:52px;letter-spacing:-0.02em;line-height:1.2}
-    h2{margin:0;font-size:26px;color:var(--accent)}
-    p{margin:0;color:var(--text);font-size:22px;line-height:1.5}
-    ul{margin:8px 0 0 28px;padding:0;color:var(--muted);font-size:22px;line-height:1.5}
-    .controls{position:absolute;left:20px;bottom:20px;display:flex;gap:10px}
-    button{background:var(--accent);border:none;color:#000;font-weight:600;padding:12px 18px;border-radius:10px;cursor:pointer;font-size:18px;box-shadow:0 4px 12px rgba(0,0,0,0.3);transition:transform .2s ease}
-    button:hover{transform:scale(1.05)}
-    .pager{position:absolute;right:20px;bottom:26px;color:var(--muted);font-size:18px;font-weight:500}
-    .footer{margin-top:auto;color:var(--muted);font-size:16px}
-    pre{background:rgba(255,255,255,0.05);padding:16px;border-radius:12px;overflow:auto;color:#fff;font-size:20px}
-    .code-inline{font-family:monospace;background:rgba(255,255,255,0.08);padding:4px 8px;border-radius:6px;font-size:20px}
-    .chip{display:inline-block;padding:8px 14px;border-radius:999px;background:var(--accent);font-size:16px;color:#000;font-weight:600}
+    html,body {height:100%; margin:0; font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;}
+    body {
+      background:radial-gradient(circle at top left,#1a2740,#0f1724 70%);
+      color:var(--text); display:flex; align-items:center; justify-content:center;
+    }
+    .deck {
+      width:100%; max-width:1100px; height:700px; position:relative; overflow:hidden;
+      border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,0.6); background:var(--card);
+    }
+    .slide {
+      position:absolute; inset:0; padding:var(--slide-padding); box-sizing:border-box;
+      display:flex; flex-direction:column; gap:28px; justify-content:center;
+      transition:transform .8s cubic-bezier(.25,.8,.25,1), opacity .8s ease;
+      opacity:0; transform:translateX(80px) scale(.9); pointer-events:none;
+      text-align:center;
+    }
+    .active {
+      opacity:1; transform:translateX(0) scale(1); pointer-events:auto;
+    }
+    h1 {
+      margin:0; font-size:64px; font-weight:800; line-height:1.2;
+      background:linear-gradient(90deg,#ff9f1c,#ff3cac,#ff9f1c);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      animation: shine 3s linear infinite;
+    }
+    @keyframes shine {
+      from {background-position:0%;}
+      to {background-position:200%;}
+    }
+    h2 {margin:0; font-size:32px; color:var(--accent);}
+    p, ul {font-size:26px; line-height:1.5;}
+    ul {margin:8px 0 0 28px; padding:0; color:var(--muted); text-align:left;}
+    .controls {
+      position:absolute; left:20px; bottom:20px; display:flex; gap:10px; z-index:100;
+    }
+    button {
+      background:var(--accent); border:none; color:#000; font-weight:600;
+      padding:14px 22px; border-radius:12px; cursor:pointer; font-size:20px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.3); transition:transform .2s ease;
+    }
+    button:hover {transform:scale(1.1);}
+    .pager {
+      position:absolute; right:20px; bottom:26px; color:var(--muted);
+      font-size:20px; font-weight:600;
+    }
+    .progress {
+      position:absolute; bottom:0; left:0; height:6px; background:var(--accent);
+      transition:width .4s ease;
+    }
+    pre {
+      background:rgba(255,255,255,0.08); padding:20px; border-radius:12px;
+      font-size:22px; line-height:1.4; overflow:auto;
+    }
+    .chip {
+      display:inline-block; padding:10px 16px; border-radius:999px;
+      background:var(--accent); font-size:18px; color:#000; font-weight:600;
+    }
+    img.qr {
+      max-width:200px; margin:20px auto; display:block; border-radius:12px;
+      box-shadow:0 6px 20px rgba(0,0,0,0.4);
+    }
   </style>
 </head>
 <body>
   <div class="deck" id="deck">
-    <section class="slide" data-index="0">
+    <section class="slide active">
       <h1>🚀 RAG is Not Enough</h1>
       <h2>From sentences → propositions for stronger retrieval</h2>
       <p>Lightning talk • 5 minutes</p>
-      <div class="footer">
-        <span class="chip">Speaker: Jai Prakash</span>
-      </div>
+      <div class="chip">Speaker: Jai Prakash</div>
     </section>
 
-    <section class="slide hidden" data-index="1">
+    <section class="slide">
       <h1>😵 The Problem</h1>
       <p>Facts are scattered. Sentences are fragmented. Retrieval misses context.</p>
       <ul>
-        <li>Sentence transformers → tiny pieces.</li>
-        <li>Vector DB → returns some sentences, not always the right ones.</li>
-        <li>Answers end up incomplete or wrong.</li>
+        <li>Sentence transformers → tiny pieces</li>
+        <li>Vector DB → returns some sentences, not always the right ones</li>
+        <li>Answers end up incomplete or wrong</li>
       </ul>
     </section>
 
-    <section class="slide hidden" data-index="2">
+    <section class="slide">
       <h1>🔍 Quick Example</h1>
-      <p>Query: <span class="code-inline">"What are the eligibility criteria?"</span></p>
-      <p>Retrieved sentences:</p>
+      <p>Query: <code>"What are the employee benefits?"</code></p>
       <ul>
-        <li>"Applicant must be 18+."</li>
-        <li>"Proof of income required."</li>
-        <li>"Exceptions exist for students."</li>
+        <li>"Employees get health insurance."</li>
+        <li>"Paid parental leave."</li>
+        <li>"401(k) retirement plan."</li>
+        <li>"Dental and vision add-ons."</li>
       </ul>
-      <p>❌ Missing combined rule = incomplete answer.</p>
+      <p>❌ Missing: combined view of benefits</p>
     </section>
 
-    <section class="slide hidden" data-index="3">
+    <section class="slide">
       <h1>💡 The Proposition Approach</h1>
-      <p>Use LLMs to <strong>group related sentences</strong> into <strong>propositions</strong> — compact, fact-rich units.</p>
+      <p>Use LLMs to group related sentences into <strong>fact-rich propositions</strong>.</p>
       <ul>
-        <li>Cluster related text.</li>
-        <li>Rewrite into atomic propositions.</li>
-        <li>Embed propositions, not raw sentences.</li>
+        <li>Cluster related text</li>
+        <li>Rewrite into atomic propositions</li>
+        <li>Embed propositions, not raw sentences</li>
       </ul>
     </section>
 
-    <section class="slide hidden" data-index="4">
+    <section class="slide">
       <h1>✨ Example Proposition</h1>
-      <pre>Applicants 18+ with proof of income qualify.
-Students are exempt if enrolled full-time.</pre>
-      <p>✅ One dense chunk instead of three scattered ones.</p>
+      <pre>
+"Employees receive a comprehensive benefits package
+including health, dental, vision insurance, 401(k),
+and paid parental leave."
+      </pre>
+      <p>✅ One chunk now answers the query fully.</p>
     </section>
 
-    <section class="slide hidden" data-index="5">
-      <h1>🚀 Why It Works</h1>
-      <ul>
-        <li>More information per vector = smarter retrieval.</li>
-        <li>Fewer fragments to stitch back.</li>
-        <li>Higher precision, no cost bloat.</li>
-      </ul>
-    </section>
-
-    <section class="slide hidden" data-index="6">
-      <h1>🛠️ How To Build</h1>
-      <ul>
-        <li>Split sentences → cluster by similarity.</li>
-        <li>Prompt LLM → generate propositions.</li>
-        <li>Embed & store in vector DB.</li>
-        <li>Retrieve top-k propositions for answering.</li>
-      </ul>
-      <pre>// Prompt idea:
-"Merge these sentences into a single fact-rich proposition."</pre>
-    </section>
-
-    <section class="slide hidden" data-index="7">
-      <h1>📊 Metrics</h1>
-      <ul>
-        <li>Completeness of answers (human eval)</li>
-        <li>Precision@k retrieval</li>
-        <li>Propositions vs sentences count</li>
-        <li>Latency & cost tradeoffs</li>
-      </ul>
-    </section>
-
-    <section class="slide hidden" data-index="8">
-      <h1>🎬 Demo Slide</h1>
-      <p>Before vs After Retrieval</p>
-      <ul>
-        <li>❌ Sentences → missing facts</li>
-        <li>✅ Propositions → complete context</li>
-      </ul>
-    </section>
-
-    <section class="slide hidden" data-index="9">
+    <section class="slide">
       <h1>🎯 Key Takeaway</h1>
       <p><strong>Don’t store plain sentences — store propositions.</strong></p>
-      <p class="footer">Questions? • Twitter: @jaiprakash • GitHub: jp-repo</p>
+    </section>
+
+    <section class="slide">
+      <h1>📚 Resources</h1>
+      <ul>
+        <li><a href="https://chunkviz.up.railway.app/" target="_blank">ChunkViz Demo</a></li>
+        <li><a href="https://github.com/FullStackRetrieval-com/RetrievalTutorials" target="_blank">Retrieval Tutorials</a></li>
+        <li><a href="https://arxiv.org/pdf/2312.06648" target="_blank">Research Paper</a></li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h1>💼 We’re Hiring!</h1>
+      <p>🚀 Join us in building smarter retrieval systems</p>
+      <p>👉 Visit our booth or scan the QR code</p>
+      <img src="assets/img/hiring.jpg" alt="Hiring QR Code" class="qr" />
     </section>
 
     <div class="controls">
@@ -129,25 +149,27 @@ Students are exempt if enrolled full-time.</pre>
       <button id="next">Next ▶</button>
       <button id="start">Presenter Mode</button>
     </div>
-    <div class="pager" id="pager">1 / 10</div>
+    <div class="pager" id="pager">1 / 8</div>
+    <div class="progress" id="progress"></div>
   </div>
 
   <script>
-    const slides = Array.from(document.querySelectorAll('.slide'));
+    const slides = document.querySelectorAll('.slide');
     let idx = 0;
     const pager = document.getElementById('pager');
+    const progress = document.getElementById('progress');
 
-    function show(i){
-      slides.forEach(s => s.classList.add('hidden'));
-      const s = slides[i];
-      s.classList.remove('hidden');
+    function show(i) {
+      slides.forEach(s => s.classList.remove('active'));
+      slides[i].classList.add('active');
       pager.textContent = (i+1) + ' / ' + slides.length;
+      progress.style.width = ((i+1)/slides.length * 100) + '%';
     }
 
-    document.getElementById('next').addEventListener('click', ()=>{ idx = Math.min(idx+1, slides.length-1); show(idx); });
-    document.getElementById('prev').addEventListener('click', ()=>{ idx = Math.max(idx-1,0); show(idx); });
+    document.getElementById('next').onclick = () => { idx = Math.min(idx+1, slides.length-1); show(idx); };
+    document.getElementById('prev').onclick = () => { idx = Math.max(idx-1,0); show(idx); };
 
-    document.addEventListener('keydown', (e)=>{
+    document.addEventListener('keydown', e => {
       if(e.key === 'ArrowRight' || e.key === 'PageDown') idx = Math.min(idx+1, slides.length-1);
       if(e.key === 'ArrowLeft' || e.key === 'PageUp') idx = Math.max(idx-1,0);
       if(e.key === 'Home') idx = 0;
@@ -155,10 +177,10 @@ Students are exempt if enrolled full-time.</pre>
       show(idx);
     });
 
-    document.getElementById('start').addEventListener('click', async ()=>{
-      try{ await document.querySelector('.deck').requestFullscreen(); }catch{}
+    document.getElementById('start').onclick = async () => {
+      try { await document.querySelector('.deck').requestFullscreen(); } catch {}
       idx = 0; show(idx);
-    });
+    };
 
     show(0);
   </script>
